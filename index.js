@@ -3,6 +3,8 @@ import cors from "cors";
 import sequelize from "./models/database.js";
 import User from "./models/user.js";
 
+import auth from "./routes/auth.js";
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -18,7 +20,9 @@ const syncDatabase = async () => {
   }
 };
 
-syncDatabase();
+// syncDatabase();
+
+app.use("/auth", auth);
 
 app.listen(PORT, async () => {
   console.log(`Server running on port: ${PORT}`);
