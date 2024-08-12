@@ -6,7 +6,12 @@ import User from "./models/user.js";
 import auth from "./routes/auth.js";
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Your frontend URL
+    credentials: true, // This allows cookies to be sent with requests
+  })
+);
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;

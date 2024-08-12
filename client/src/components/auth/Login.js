@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -24,16 +26,21 @@ const Login = () => {
     try {
       const response = await axios.post(
         "http://localhost:5000/auth/login",
-        formData
+        formData,
+        { withCredentials: true }
       );
       setSuccess("Login successful! Welcome back.");
       setError("");
+      //   await Cookies.set("JWTToken", response.data.JWTToken, { expires: 1 }); // Cookie expires in 1 day
       // Reset form after successful login
       setFormData({
         email: "",
         password: "",
       });
       // Redirect or perform other actions
+      setTimeout(() => {
+        navigate("/home"); // Redirect to the login page
+      }, 1000);
     } catch (err) {
       setError("Login failed. Please check your credentials.");
       setSuccess("");
