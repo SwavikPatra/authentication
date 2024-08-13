@@ -5,6 +5,8 @@ import User from "../models/user.js"; // Import your User model
 import jwt from "jsonwebtoken";
 import cors from "cors";
 
+import authenticateTokenMiddleware from "../middleware/authenticateTokenMiddleware.js";
+
 const auth = express.Router(); // Changed variable name to auth
 const JWT_SECRET =
   "f3d2b31b2f6e84c930d8b658c8e8a45e789d6de69e5476e621e08d6c7c4ec80c";
@@ -16,6 +18,11 @@ auth.use(
     credentials: true, // This allows cookies to be sent with requests
   })
 );
+
+auth.get("/checkAuth", authenticateTokenMiddleware, (req, res) => {
+  console.log("inside checkauth in the backend");
+  res.status(200).json({ message: "User is authenticated" });
+});
 
 auth.post("/signup", async (req, res) => {
   console.log("signup backend");
@@ -49,9 +56,7 @@ auth.post("/signup", async (req, res) => {
 });
 
 auth.post("/login", async (req, res) => {
-  console.log("in the login auth backend");
   const { email, password } = req.body;
-  console.log(`${email}, ${password}`);
   try {
     const user = await User.findOne({ where: { email } });
     if (!user) {
@@ -61,24 +66,25 @@ auth.post("/login", async (req, res) => {
     console.log("user found");
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log("auth backend, password wrong");
       return res.status(400).json({ message: "Invalid credential" });
     }
-    console.log("is match successfull");
     const JWTToken = jwt.sign({ userId: user.id }, JWT_SECRET, {
       expiresIn: "1h",
     });
-    console.log(`jwt token : ${JWTToken}`);
-    console.log("after jwt token creation");
     // Set the token in an HttpOnly cookie
     res.cookie("JWTToken", JWTToken, { maxAge: 3600000 }); // 1 hour
-    console.log("Cookie set in response");
 
     res.status(200).json({ message: "Login successful", userId: user.id });
   } catch (err) {
-    console.log("auth backend, catch error section");
     res.status(500).json({ message: "Server error" });
   }
+});
+
+auth.post("/logout", (req, res) => {
+  console.log("in the logout backend");
+  // console.log(`token ${req.data.token}`)
+  res.clearCookie("JWTToken");
+  res.status(200).json({ message: "Logout successful" });
 });
 
 // Sync the model with the database if needed

@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import sequelize from "./models/database.js";
+import cookieParser from "cookie-parser";
 import User from "./models/user.js";
 
 import auth from "./routes/auth.js";
@@ -13,6 +14,8 @@ app.use(
   })
 );
 app.use(express.json());
+
+app.use(cookieParser());
 
 const PORT = process.env.PORT || 5000;
 

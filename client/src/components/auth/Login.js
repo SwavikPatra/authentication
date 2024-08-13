@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const Login = () => {
+const Login = ({ onLogin }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
@@ -37,6 +37,10 @@ const Login = () => {
         email: "",
         password: "",
       });
+      if (response.status === 200) {
+        // Call the onLogin prop to update the state in App
+        onLogin();
+      }
       // Redirect or perform other actions
       setTimeout(() => {
         navigate("/home"); // Redirect to the login page
